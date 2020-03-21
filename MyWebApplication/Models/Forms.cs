@@ -13,8 +13,7 @@ namespace MyWebApplication
 
         public int Id { get; set; }
         [Required(ErrorMessage = "The field cannot be empty!"), RegularExpression("[A-Z][a-z]+", ErrorMessage = "The field is not correct!")]
-        [Display(Name = "Форма")]
-
+        [Display(Name = "Form")]
         public string Name { get; set; }
 
         public virtual ICollection<Guitars> Guitars { get; set; }

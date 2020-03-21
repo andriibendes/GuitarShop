@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 using MyWebApplication;
+using ClosedXML.Excel;
 
 namespace MyWebApplication.Controllers
 {
@@ -154,5 +157,123 @@ namespace MyWebApplication.Controllers
         {
             return _context.Brands.Any(e => e.Id == id);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Import(IFormFile fileExcel)
+        {
+            if (ModelState.IsValid)
+            {
+                if (fileExcel != null)
+                {
+                    using (var stream = new FileStream(fileExcel.FileName, FileMode.Create))
+                    {
+                        await fileExcel.CopyToAsync(stream);
+                        using (XLWorkbook workBook = new XLWorkbook(stream, XLEventTracking.Disabled))
+                        {
+                            //перегляд усіх листів (в даному випадку категорій)
+                            foreach (IXLWorksheet worksheet in workBook.Worksheets)
+                            {
+                                //worksheet.Name - назва категорії. Пробуємо знайти в БД, якщо відсутня, то створюємо нову
+                                Brands newbrand;
+                                var b = (from br in _context.Brands where 
+                                         br.Name.Contains(worksheet.Name) select br).ToList();
+                                if (b.Count > 0)
+                                {
+                                    newbrand = b[0];
+                                }
+                                else
+                                {
+                                    newbrand = new Brands();
+                                    newbrand.Name = worksheet.Name;
+                                    newbrand.Country = "Ukraine";
+                                    //додати в контекст
+                                    _context.Brands.Add(newbrand);
+                                }
+                                //перегляд усіх рядків                    
+                                foreach (IXLRow row in worksheet.RowsUsed())
+                                {
+                                    try
+                                    {
+                                        Guitars guitar = new Guitars();
+                                        var guitars = (from g in _context.Guitars where 
+                                                       g.Name.Contains(row.Cell(1).Value.ToString()) select g).ToList();
+                                        if (guitars.Count > 0)
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            guitar.Name = row.Cell(1).Value.ToString();
+                                            guitar.Brand = newbrand;
+                                            guitar.Cost = Convert.ToInt32(row.Cell(2).Value);
+                                            guitar.Year = Convert.ToInt32(row.Cell(3).Value);
+                                            guitar.Info = "from excel";
+                                            //у разі наявності автора знайти його, у разі відсутності - додати
+
+                                            Forms form;
+                                            var forms = (from f in _context.Forms where 
+                                                         f.Name.Contains(row.Cell(4).Value.ToString()) select f).ToList();
+                                            if (forms.Count > 0)
+                                            {
+                                                form = forms[0];
+                                            }
+                                            else
+                                            {
+                                                form = new Forms();
+                                                form.Name = row.Cell(4).Value.ToString();
+                                                _context.Forms.Add(form);
+                                            }
+                                            guitar.Form = form;
+
+                                            Materials material;
+                                            var materials = (from m in _context.Materials where 
+                                                             m.Name.Contains(row.Cell(5).Value.ToString()) select m).ToList();
+                                            if (materials.Count > 0)
+                                            {
+                                                material = materials[0];
+                                            }
+                                            else
+                                            {
+                                                material = new Materials();
+                                                material.Name = row.Cell(5).Value.ToString();
+                                                _context.Materials.Add(material);
+                                            }
+                                            guitar.Material = material;
+
+                                            Types type;
+                                            var types = (from t in _context.Types where 
+                                                         t.Name.Contains(row.Cell(6).Value.ToString()) select t).ToList();
+                                            if (types.Count > 0)
+                                            {
+                                                type = types[0];
+                                            }
+                                            else
+                                            {
+                                                type = new Types();
+                                                type.Name = row.Cell(6).Value.ToString();
+                                                _context.Types.Add(type);
+                                            }
+                                            guitar.Type = type;
+
+                                            _context.Guitars.Add(guitar);
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        //logging самостійно :)
+                                        throw new Exception("Text with context data", e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
