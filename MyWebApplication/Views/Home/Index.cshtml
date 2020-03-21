@@ -2,13 +2,89 @@
     ViewData["Title"] = "Home Page";
 }
 
-    <div class="text-center">
-        <h1 class="display-4" style="font-size:xx-large; color:black">Welcome to site!</h1>
+<div class="text-center" style="margin-bottom: 10px">
+    <h1 class="display-4" style="font-size:xx-large; color:black">Welcome to site!</h1>
+</div>
 
-        <a type="button" class="btn btn-success" href="Brands">Brands</a>
-        <a type="button" class="btn btn-info" href="Types">Types</a>
-        <a type="button" class="btn btn-warning" href="Materials">Materials</a>
-        <a type="button" class="btn btn-success" href="Forms">Forms</a>
-        <a type="button" class="btn btn-info" href="Musicians">Musicians</a>
-        <a type="button" class="btn btn-warning" href="Guitars">Guitars</a>
-    </div>
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', { 'packages': ['corechart'] });
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+            $.get('api/Br/JsonDataBrands', function (jsonData) {
+                data = google.visualization.arrayToDataTable(jsonData, false);
+                // Set chart options
+                var options = {
+                    'title': 'Percentage of Guitars by Brands',
+                    'width': 600,
+                    'height': 400
+                };
+                // Instantiate and draw our chart, passing in some options.
+                var chart = new google.visualization.PieChart(document.getElementById('chart_brand'));
+                chart.draw(data, options);
+            })
+        }
+    </script>
+</head>
+
+
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', { 'packages': ['corechart'] });
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(drawChart);
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart() {
+            $.get('api/Br/JsonDataPrice', function (jsonData) {
+                data = google.visualization.arrayToDataTable(jsonData, false);
+                // Set chart options
+                var options = {
+                    'title': 'Average price of Guitars by Brands',
+                    'width': 600,
+                    'height': 400
+                };
+                // Instantiate and draw our chart, passing in some options.
+                var chart = new google.visualization.ColumnChart(document.getElementById('chart_price'));
+                chart.draw(data, options);
+            })
+        }
+    </script>
+</head>
+
+<div style="display: flex">
+    <div id="chart_brand" style="height: 400px; width: 600px; margin-right: 7px;"></div>
+    <div id="chart_price" style="height: 400px; width: 600px; margin-right: 2px; margin-bottom: 10px"></div>
+</div>
+
+<div style="margin-left: 19vw; margin-bottom: 20px">
+    <h3>Choose exel-file to upload</h3>
+    @using (Html.BeginForm("Import", "Brands", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+    {
+        <div>
+            Upload Excel-file:
+            <input type="file" name="fileExcel" id="fileExcel" />
+            <div>
+                <input class="btn btn-success" type="submit" value="Upload" />
+            </div>
+        </div>
+    }
+</div>
+
+<div style="margin-left: 19vw; margin-bottom: 14px">
+    <h3>Download information in file</h3>
+    <a asp-controller="Brands" asp-action="Export" type="button" class="btn btn-success">Download</a>
+</div>

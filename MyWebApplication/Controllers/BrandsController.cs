@@ -275,5 +275,52 @@ namespace MyWebApplication.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public ActionResult Export()
+        {
+            using (XLWorkbook workbook = new XLWorkbook(XLEventTracking.Disabled))
+            {
+                var brands = _context.Brands.Include("Guitars").ToList();
+                //тут, для прикладу ми пишемо усі книжки з БД, в своїх проектах ТАК НЕ РОБИТИ (писати лише вибрані)
+                foreach (var b in brands)
+                {
+                    var worksheet = workbook.Worksheets.Add(b.Name);
+
+                    worksheet.Cell("A1").Value = "Name";
+                    worksheet.Cell("B1").Value = "Price";
+                    worksheet.Cell("C1").Value = "Year";
+                    worksheet.Cell("D1").Value = "Form";
+                    worksheet.Cell("E1").Value = "Material";
+                    worksheet.Cell("F1").Value = "Type";
+                    worksheet.Cell("G1").Value = "Info";
+                    worksheet.Row(1).Style.Font.Bold = true;
+                    var guitars = b.Guitars.ToList();
+
+                    //нумерація рядків/стовпчиків починається з індекса 1 (не 0)
+                    for (int i = 0; i < guitars.Count; i++)
+                    {
+                        worksheet.Cell(i + 2, 1).Value = guitars[i].Name;
+                        worksheet.Cell(i + 2, 2).Value = guitars[i].Cost;
+                        worksheet.Cell(i + 2, 3).Value = guitars[i].Year;
+                        var form = _context.Forms.Where(f => f.Id == guitars[i].FormId).ToString();
+                        worksheet.Cell(i + 2, 4).Value = _context.Forms.Where(f => f.Id == guitars[i].FormId).ToList()[0].Name;
+                        worksheet.Cell(i + 2, 5).Value =  _context.Materials.Where(m => m.Id == guitars[i].MaterialId).ToList()[0].Name;
+                        worksheet.Cell(i + 2, 6).Value = _context.Types.Where(t => t.Id == guitars[i].TypeId).ToList()[0].Name;
+                        worksheet.Cell(i + 2, 7).Value = guitars[i].Info;
+                    }
+                }
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Flush();
+
+                    return new FileContentResult(stream.ToArray(),
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    {
+                        FileDownloadName = $"GuitarShop{DateTime.UtcNow.ToShortDateString()}.xlsx"
+                    };
+                }
+            }
+        }
+
     }
 }

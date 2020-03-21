@@ -19,8 +19,8 @@ namespace MyWebApplication.Controllers
             _context = context;
         }
 
-        [HttpGet("JsonData")]
-        public JsonResult JsonData()
+        [HttpGet("JsonDataBrands")]
+        public JsonResult JsonDataBrands()
         {
             var brands = _context.Brands.Include(g => g.Guitars).ToList();
             List<object> cGuitar = new List<object>();
@@ -28,6 +28,30 @@ namespace MyWebApplication.Controllers
             foreach (var b in brands)
             {
                 cGuitar.Add( new object[] { b.Name, b.Guitars.Count() });
+            }
+            return new JsonResult(cGuitar);
+        }
+
+        [HttpGet("JsonDataPrice")]
+        public JsonResult JsonDataPrice()
+        {
+            var brands = _context.Brands.Include(g => g.Guitars).ToList();
+            List<object> cGuitar = new List<object>();
+            cGuitar.Add(new[] { "Brand", "Average price" });
+
+            foreach (var b in brands)
+            {
+                if (b.Guitars.Count == 0)
+                {
+                    continue;
+                }
+                int average = 0;
+                foreach (var g in b.Guitars)
+                {
+                    average += g.Cost;
+                }
+                average /= b.Guitars.Count;
+                cGuitar.Add(new object[] { b.Name, average });
             }
             return new JsonResult(cGuitar);
         }
