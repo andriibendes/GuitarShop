@@ -18,6 +18,19 @@ namespace MyWebApplication.Controllers
             _context = context;
         }
 
+        public IActionResult VerifyName(string name)
+        {
+            var guitars = (from g in _context.Guitars where g.Name == name select g).ToList();
+            if (guitars.Count > 0)
+            {
+                return Json($"Name {name} is already exsists.");
+            }
+            else
+            {
+                return Json(true);
+            }
+        }
+
         // GET: Guitars
         public async Task<IActionResult> Index(int? id, string? name)
         {

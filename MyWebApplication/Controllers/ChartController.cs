@@ -10,11 +10,11 @@ namespace MyWebApplication.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BrController : ControllerBase
+    public class ChartController : ControllerBase
     {
         private readonly guitar_shopContext _context;
 
-        public BrController(guitar_shopContext context)
+        public ChartController(guitar_shopContext context)
         {
             _context = context;
         }

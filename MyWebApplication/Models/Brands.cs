@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -7,7 +8,6 @@ namespace MyWebApplication
 {
     public class CountryNameValidator : ValidationAttribute
     {
-
         public CountryNameValidator()
         {
         }
@@ -37,6 +37,7 @@ namespace MyWebApplication
         }
 
     }
+
     public partial class Brands
     {
         public Brands()
@@ -46,6 +47,7 @@ namespace MyWebApplication
 
         public int Id { get; set; }
         [Required(ErrorMessage = "The field cannot be empty!"), RegularExpression("[A-Z][a-z]+", ErrorMessage = "The name is not correct!")]
+        [Remote(action: "VerifyName", controller: "Brands")]
         [Display(Name = "Name")]
         public string Name { get; set; }
         [Required(ErrorMessage = "The field cannot be empty!"), CountryNameValidator()]

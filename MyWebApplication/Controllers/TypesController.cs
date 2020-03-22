@@ -18,6 +18,19 @@ namespace MyWebApplication.Controllers
             _context = context;
         }
 
+        public IActionResult VerifyName(string name)
+        {
+            var types = (from t in _context.Types where t.Name == name select t).ToList();
+            if (types.Count > 0)
+            {
+                return Json($"Name {name} is already exsists.");
+            }
+            else
+            {
+                return Json(true);
+            }
+        }
+
         // GET: Types
         public async Task<IActionResult> Index()
         {

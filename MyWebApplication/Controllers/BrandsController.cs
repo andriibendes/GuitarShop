@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using MyWebApplication;
 using ClosedXML.Excel;
+using System.Globalization;
 
 namespace MyWebApplication.Controllers
 {
@@ -19,6 +20,20 @@ namespace MyWebApplication.Controllers
         public BrandsController(guitar_shopContext context)
         {
             _context = context;
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult VerifyName(string name)
+        {
+            var brands = (from b in _context.Brands where b.Name == name select b).ToList();
+            if (brands.Count > 0)
+            {
+                return Json($"Name {name} is already exsists.");
+            }
+            else
+            {
+                return Json(true);
+            }
         }
 
         // GET: Brands

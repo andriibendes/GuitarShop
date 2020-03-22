@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -22,6 +23,7 @@ namespace MyWebApplication
 
         public int Id { get; set; }
         [Required(ErrorMessage = "The field cannot be empty!")]
+        [Remote(action: "VerifyName", controller: "Guitars")]
         [Display(Name = "Name")]
         public string Name { get; set; }
 
