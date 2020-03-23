@@ -25,7 +25,7 @@ namespace MyWebApplication
         public virtual DbSet<Musicians> Musicians { get; set; }
         public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<Types> Types { get; set; }
-        public virtual DbSet<Users> Users { get; set; }
+        //public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -78,11 +78,11 @@ namespace MyWebApplication
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
-                entity.HasOne(d => d.User)
+                /*entity.HasOne(d => d.User)
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_comments_users");
+                    .HasConstraintName("FK_comments_users");*/
             });
 
             modelBuilder.Entity<Forms>(entity =>
@@ -253,11 +253,11 @@ namespace MyWebApplication
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_orders_guitars");
 
-                entity.HasOne(d => d.User)
+                /*entity.HasOne(d => d.User)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_orders_users");
+                    .HasConstraintName("FK_orders_users");*/
             });
 
             modelBuilder.Entity<Types>(entity =>
@@ -273,7 +273,7 @@ namespace MyWebApplication
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<Users>(entity =>
+            /*modelBuilder.Entity<Users>(entity =>
             {
                 entity.ToTable("users");
 
@@ -290,7 +290,7 @@ namespace MyWebApplication
                     .HasColumnName("password")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-            });
+            });*/
 
             OnModelCreatingPartial(modelBuilder);
         }

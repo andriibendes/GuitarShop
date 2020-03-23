@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using MyWebApplication;
 using ClosedXML.Excel;
-using System.Globalization;
 
 namespace MyWebApplication.Controllers
 {
@@ -28,7 +27,7 @@ namespace MyWebApplication.Controllers
             var brands = (from b in _context.Brands where b.Name == name select b).ToList();
             if (brands.Count > 0)
             {
-                return Json($"Name {name} is already exsists.");
+                return Json($"Name {name} is already exists.");
             }
             else
             {

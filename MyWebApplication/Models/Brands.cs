@@ -35,7 +35,6 @@ namespace MyWebApplication
             }
             return new ValidationResult(GetErrorMessage());
         }
-
     }
 
     public partial class Brands

@@ -23,7 +23,7 @@ namespace MyWebApplication.Controllers
             var guitars = (from g in _context.Guitars where g.Name == name select g).ToList();
             if (guitars.Count > 0)
             {
-                return Json($"Name {name} is already exsists.");
+                return Json($"Name {name} is already exists.");
             }
             else
             {

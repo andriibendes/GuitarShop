@@ -23,7 +23,7 @@ namespace MyWebApplication.Controllers
             var forms = (from f in _context.Forms where f.Name == name select f).ToList();
             if (forms.Count > 0)
             {
-                return Json($"Name {name} is already exsists.");
+                return Json($"Name {name} is already exists.");
             }
             else
             {

@@ -23,7 +23,7 @@ namespace MyWebApplication.Controllers
             var types = (from t in _context.Types where t.Name == name select t).ToList();
             if (types.Count > 0)
             {
-                return Json($"Name {name} is already exsists.");
+                return Json($"Name {name} is already exists.");
             }
             else
             {

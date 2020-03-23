@@ -6,6 +6,21 @@
     <h1 class="display-4" style="font-size:xx-large; color:black">Welcome to site!</h1>
 </div>
 
+@if (User.Identity.IsAuthenticated)
+{
+    <p>@User.Identity.Name</p>
+
+    <form method="post" asp-controller="Account" asp-action="Logout">
+        <input type="submit" value="Вихід" />
+    </form>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login">Вхід</a>
+    <a asp-controller="Account" asp-action="Register">Реєстація</a>
+}
+
+
 <html>
 <head>
     <!--Load the AJAX API-->
@@ -64,6 +79,8 @@
         }
     </script>
 </head>
+
+
 
 <div style="display: flex">
     <div id="chart_brand" style="height: 400px; width: 600px; margin-right: 7px;"></div>

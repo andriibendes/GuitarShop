@@ -12,6 +12,6 @@ namespace MyWebApplication
         public string DeliveryCost { get; set; }
 
         public virtual Guitars Guitar { get; set; }
-        public virtual Users User { get; set; }
+        //public virtual Users User { get; set; }
     }
 }
