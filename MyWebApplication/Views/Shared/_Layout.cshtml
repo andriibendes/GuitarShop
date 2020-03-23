@@ -18,25 +18,38 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
+                        <li class="nav-item" style="display: flex">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a type="button" class="btn btn-success" href="Brands">Brands</a>
-                            <a type="button" class="btn btn-info" href="Types">Types</a>
-                            <a type="button" class="btn btn-warning" href="Materials">Materials</a>
-                            <a type="button" class="btn btn-success" href="Forms">Forms</a>
-                            <a type="button" class="btn btn-info" href="Musicians">Musicians</a>
-                            <a type="button" class="btn btn-warning" href="Guitars">Guitars</a>
-                            <a style="margin-left: 7vw" type="button" class="btn btn-light" href="Account/Register">Sign Up</a>
-
+                        <li class="nav-item" style="display: flex">
+                            <a type="button" class="btn btn-success" asp-controller="Brands" asp-action="Index">Brands</a>
+                            <a type="button" class="btn btn-info" asp-controller="Types" asp-action="Index">Types</a>
+                            <a type="button" class="btn btn-warning" asp-controller="Materials" asp-action="Index">Materials</a>
+                            <a type="button" class="btn btn-success" asp-controller="Forms" asp-action="Index">Forms</a>
+                            <!--<a type="button" class="btn btn-info" href="Musicians">Musicians</a>-->
+                            <a type="button" class="btn btn-warning" asp-controller="Guitars" asp-action="Index">Guitars</a>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (User.IsInRole("admin"))
+                                {
+                                    <a style="margin-left: 5vw" class="btn btn-light" asp-controller="Roles" asp-action="Index">Roles</a>
+                                }
+                                <form method="post" style="margin-left: 5vw">
+                                    <input class="btn btn-light" asp-controller="Account" asp-action="Logout" value="Sign Out" type="submit" />
+                                </form>
+                            }
+                            else
+                            {
+                                <a style="margin-left: 5vw" class="btn btn-light" asp-controller="Account" asp-action="Login">Sign In</a>
+                                <a class="btn btn-light" asp-controller="Account" asp-action="Register">Sign Up</a>
+                            }
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container" style="display: flex">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

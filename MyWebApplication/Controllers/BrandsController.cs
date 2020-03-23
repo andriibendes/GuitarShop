@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using MyWebApplication;
 using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyWebApplication.Controllers
 {
+    [Authorize(Roles = "admin, user")]
     public class BrandsController : Controller
     {
         private readonly guitar_shopContext _context;

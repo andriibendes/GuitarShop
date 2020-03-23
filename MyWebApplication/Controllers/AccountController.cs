@@ -35,7 +35,7 @@ namespace MyWebApplication
                 {
                     // установка кукі
                     await _signInManager.SignInAsync(user, false);
-                    return RedirectToAction("Index", "Brands");
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -71,7 +71,7 @@ namespace MyWebApplication
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Brands");
+                        return RedirectToAction("Index", "Home");
                     }
                 }
                 else
@@ -88,7 +88,7 @@ namespace MyWebApplication
         {
             // видаляємо аутентифікаційні куки
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Brands");
+            return RedirectToAction("Index", "Home");
         }
 
     }

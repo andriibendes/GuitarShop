@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyWebApplication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyWebApplication.Controllers
 {
+    [Authorize(Roles = "admin, user")]
     public class FormsController : Controller
     {
         private readonly guitar_shopContext _context;
