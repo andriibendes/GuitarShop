@@ -19,6 +19,7 @@ namespace MyWebApplication.ViewModel
 
         [Required]
         [Display(Name = "Password")]
+        [StringLength(100, ErrorMessage = "Minimum length of password is 6.", MinimumLength = 5)]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 

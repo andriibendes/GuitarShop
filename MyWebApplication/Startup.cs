@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyWebApplication.Models;
 
 namespace MyWebApplication
 {
@@ -25,6 +26,9 @@ namespace MyWebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IPasswordValidator<User>,
+        CustomPasswordValidator>(serv => new CustomPasswordValidator(6));
+
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<guitar_shopContext>(options => options.UseSqlServer(connection));
             services.AddControllersWithViews();

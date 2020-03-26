@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MyWebApplication.Controllers
 {
+    [Authorize(Roles = "admin, user")]
     public class TypesController : Controller
     {
         private readonly guitar_shopContext _context;
