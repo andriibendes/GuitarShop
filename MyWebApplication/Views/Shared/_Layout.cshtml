@@ -32,11 +32,20 @@
                             {
                                 if (User.IsInRole("admin"))
                                 {
-                                    <a style="margin-left: 5vw" class="btn btn-light" asp-controller="Roles" asp-action="Index">Roles</a>
+                                    <a style="margin-left: 4vw" class="btn btn-light" asp-controller="Roles" asp-action="Index">Roles</a>
+                                    <a class="btn btn-light" asp-controller="Users" asp-action="Index">Users</a>
+                                    <form method="post">
+                                        <input class="btn btn-light" asp-controller="Account" asp-action="Logout" value="Sign Out" type="submit" />
+                                    </form>
+
                                 }
-                                <form method="post" style="margin-left: 5vw">
-                                    <input class="btn btn-light" asp-controller="Account" asp-action="Logout" value="Sign Out" type="submit" />
-                                </form>
+                                else
+                                {
+                                    <form method="post" style="margin-left: 10vw">
+                                        <input class="btn btn-light" asp-controller="Account" asp-action="Logout" value="Sign Out" type="submit" />
+                                    </form>
+                                }
+
                             }
                             else
                             {

@@ -8,8 +8,8 @@ namespace MyWebApplication
     {
         public static async Task InitializeAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
-            string adminEmail = "adm@gmail.com";
-            string password = "Slon_10";
+            string adminEmail = "admin@gmail.com";
+            string password = "111111";
             if (await roleManager.FindByNameAsync("admin") == null)
             {
                 await roleManager.CreateAsync(new IdentityRole("admin"));

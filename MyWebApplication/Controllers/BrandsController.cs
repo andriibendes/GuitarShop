@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using MyWebApplication;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml;
+using System.IO.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace MyWebApplication.Controllers
 {
@@ -182,6 +185,11 @@ namespace MyWebApplication.Controllers
             {
                 if (fileExcel != null)
                 {
+                    List<Brands> addedBrands = new List<Brands>();
+                    List<Types> addedTypes = new List<Types>();
+                    List<Materials> addedMaterials = new List<Materials>();
+                    List<Forms> addedForms = new List<Forms>();
+                    List<Guitars> addedGuitars = new List<Guitars>();
                     using (var stream = new FileStream(fileExcel.FileName, FileMode.Create))
                     {
                         await fileExcel.CopyToAsync(stream);
@@ -192,8 +200,10 @@ namespace MyWebApplication.Controllers
                             {
                                 //worksheet.Name - назва категорії. Пробуємо знайти в БД, якщо відсутня, то створюємо нову
                                 Brands newbrand;
-                                var b = (from br in _context.Brands where 
-                                         br.Name.Contains(worksheet.Name) select br).ToList();
+                                var b = (from br in _context.Brands
+                                         where
+              br.Name.Contains(worksheet.Name)
+                                         select br).ToList();
                                 if (b.Count > 0)
                                 {
                                     newbrand = b[0];
@@ -203,6 +213,7 @@ namespace MyWebApplication.Controllers
                                     newbrand = new Brands();
                                     newbrand.Name = worksheet.Name;
                                     newbrand.Country = "Ukraine";
+                                    addedBrands.Add(newbrand);
                                     //додати в контекст
                                     _context.Brands.Add(newbrand);
                                 }
@@ -212,8 +223,10 @@ namespace MyWebApplication.Controllers
                                     try
                                     {
                                         Guitars guitar = new Guitars();
-                                        var guitars = (from g in _context.Guitars where 
-                                                       g.Name.Contains(row.Cell(1).Value.ToString()) select g).ToList();
+                                        var guitars = (from g in _context.Guitars
+                                                       where
+                                        g.Name.Contains(row.Cell(1).Value.ToString())
+                                                       select g).ToList();
                                         if (guitars.Count > 0)
                                         {
                                             continue;
@@ -228,8 +241,10 @@ namespace MyWebApplication.Controllers
                                             //у разі наявності автора знайти його, у разі відсутності - додати
 
                                             Forms form;
-                                            var forms = (from f in _context.Forms where 
-                                                         f.Name.Contains(row.Cell(4).Value.ToString()) select f).ToList();
+                                            var forms = (from f in _context.Forms
+                                                         where
+                                            f.Name.Contains(row.Cell(4).Value.ToString())
+                                                         select f).ToList();
                                             if (forms.Count > 0)
                                             {
                                                 form = forms[0];
@@ -238,13 +253,16 @@ namespace MyWebApplication.Controllers
                                             {
                                                 form = new Forms();
                                                 form.Name = row.Cell(4).Value.ToString();
+                                                addedForms.Add(form);
                                                 _context.Forms.Add(form);
                                             }
                                             guitar.Form = form;
 
                                             Materials material;
-                                            var materials = (from m in _context.Materials where 
-                                                             m.Name.Contains(row.Cell(5).Value.ToString()) select m).ToList();
+                                            var materials = (from m in _context.Materials
+                                                             where
+                                            m.Name.Contains(row.Cell(5).Value.ToString())
+                                                             select m).ToList();
                                             if (materials.Count > 0)
                                             {
                                                 material = materials[0];
@@ -253,13 +271,16 @@ namespace MyWebApplication.Controllers
                                             {
                                                 material = new Materials();
                                                 material.Name = row.Cell(5).Value.ToString();
+                                                addedMaterials.Add(material);
                                                 _context.Materials.Add(material);
                                             }
                                             guitar.Material = material;
 
                                             Types type;
-                                            var types = (from t in _context.Types where 
-                                                         t.Name.Contains(row.Cell(6).Value.ToString()) select t).ToList();
+                                            var types = (from t in _context.Types
+                                                         where
+                                            t.Name.Contains(row.Cell(6).Value.ToString())
+                                                         select t).ToList();
                                             if (types.Count > 0)
                                             {
                                                 type = types[0];
@@ -268,11 +289,14 @@ namespace MyWebApplication.Controllers
                                             {
                                                 type = new Types();
                                                 type.Name = row.Cell(6).Value.ToString();
+                                                addedTypes.Add(type);
                                                 _context.Types.Add(type);
                                             }
                                             guitar.Type = type;
 
+                                            addedGuitars.Add(guitar);
                                             _context.Guitars.Add(guitar);
+                                            await _context.SaveChangesAsync();
                                         }
                                     }
                                     catch (Exception e)
@@ -284,9 +308,53 @@ namespace MyWebApplication.Controllers
                             }
                         }
                     }
+
+                    MemoryStream memory = new MemoryStream();
+                    using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(memory, WordprocessingDocumentType.Document))
+                    {
+                        // Add a main document part. 
+                        MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
+
+                        // Create the document structure and add some text.
+                        mainPart.Document = new Document();
+                        Body body = mainPart.Document.AppendChild(new Body());
+                        Paragraph para = body.AppendChild(new Paragraph());
+                        Run run = para.AppendChild(new Run());
+                        run.AppendChild(new Text("Added " + addedBrands.Count.ToString() + " Brands: "));
+                        foreach (Brands b in addedBrands)
+                        {
+                            run.AppendChild(new Text(b.Name + ", "));
+                        }
+                        run.AppendChild(new Break());
+                        run.AppendChild(new Text("Added " + addedTypes.Count.ToString() + " Types: "));
+                        foreach (Types t in addedTypes)
+                        {
+                            run.AppendChild(new Text(t.Name + ", "));
+                        }
+                        run.AppendChild(new Break());
+                        run.AppendChild(new Text("Added " + addedForms.Count.ToString() + " Forms: "));
+                        foreach (Forms f in addedForms)
+                        {
+                            run.AppendChild(new Text(f.Name + ", "));
+                        }
+                        run.AppendChild(new Break());
+                        run.AppendChild(new Text("Added " + addedMaterials.Count.ToString() + " Materials: "));
+                        foreach (Materials m in addedMaterials)
+                        {
+                            run.AppendChild(new Text(m.Name + ", "));
+                        }
+                        run.AppendChild(new Break());
+                        run.AppendChild(new Text("Added " + addedGuitars.Count.ToString() + " Guitars: "));
+                        foreach (Guitars g in addedGuitars)
+                        {
+                            run.AppendChild(new Text(g.Name + ", "));
+                        }
+                        mainPart.Document.Save();
+                    }
+                    memory.Seek(0, SeekOrigin.Begin);
+                    return File(memory, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "Report.docx");
                 }
 
-                await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
         }
@@ -337,6 +405,5 @@ namespace MyWebApplication.Controllers
                 }
             }
         }
-
     }
 }

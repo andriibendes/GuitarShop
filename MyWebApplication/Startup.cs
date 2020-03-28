@@ -28,9 +28,10 @@ namespace MyWebApplication
         {
             services.AddTransient<IPasswordValidator<User>, CustomPasswordValidator>(serv => new CustomPasswordValidator(6));
 
-            services.AddIdentity<User, IdentityRole>(opts => {
+            services.AddIdentity<User, IdentityRole>(opts =>
+            {
                 opts.User.RequireUniqueEmail = true;
-            }).AddEntityFrameworkStores<IdentityContext>();
+            }).AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders();
 
             services.AddTransient<IUserValidator<User>, CustomUserValidator>();
 
